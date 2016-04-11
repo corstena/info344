@@ -1,0 +1,118 @@
+/*
+Albert Corsten INFO 344 PA1
+CSS for NBA player search
+*/
+
+h1 {
+	font-size: 28px;
+	text-align: center;
+}
+
+h2 {
+	display: inline-block;
+	margin: 8px;
+	text-align: left;
+	width: 658px;
+}
+
+h3 {
+	margin: 4px;
+}
+
+h1, h2, h3 {
+	font-family: Helvetica, sans-serif;
+}
+
+.column {
+    float: left;
+    position: relative;
+}
+
+#content {
+	border: 4px gray solid;
+	background-color: #2d2d86;
+	margin: auto;
+	width: 1144px;
+	border-radius: 20px;
+}
+
+#intro {
+	text-align: center;
+}
+
+#footer {
+	bottom: 0px;
+	position: fixed;
+    text-align: center;
+    width: 100%;
+}
+
+
+#logo {
+	vertical-align: middle;
+}
+
+#pictureColumn {
+	width: 22%;
+	vertical-align: top;
+}
+
+#playerResult {
+	background: #e2e0e4;
+	border-color: black;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 20px 50px;
+	box-shadow: 10px 10px 5px #888888;
+	display: inline-block;
+	padding-left: 15px;
+	padding-right: 15px;
+	margin: 30px;
+	height: 250px;
+	text-align: center;
+	width: 1050px;
+}
+
+#playerStatsColumn {
+	width: 20%;
+}
+
+#miscStatsColumn {
+	width: 22%;
+}
+
+ #gameStatsColumn {
+	width: 36%;
+}
+
+#playerStatsColumn, #miscStatsColumn, #gameStatsColumn p{
+	text-align: left;
+	margin-top: 4px;
+}
+
+#profilePicture {
+	display: inline-block;
+	margin-top: 25px;
+	vertical-align: center;
+}
+
+#search {
+	text-align: center;
+}
+
+table {
+	margin: 0px auto;
+}
+
+table, th, td {
+   border: 1px solid black;
+} 
+
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+	background-color: #f2f2f2;
+}

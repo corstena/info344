@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"
+            integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
+            crossorigin="anonymous"></script>
+    <script src="query.js"></script>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:regular,bold" type="text/css" />
+    <link href="search.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div id="main">
+        <h1 class="title">Mini-Search Engine</h1>
+        <input type="text" id="searchBox" autocomplete="off" autofocus />
+        <h4 id="resultsText">Showing results for: <b id="searchPrefix"></b></h4>
+        <ul id="results"></ul>
+    </div>
+    <div id="playerResults"></div>
+    <div id="searchResults"></div>
+
+    <script>
+        $(document).ready(function () {
+            $("#searchBox").keyup(function () {
+                $("#playerResults").html("");
+                $.ajax({
+                    crossDomain: true,
+                    url: "http://ec2-52-34-103-127.us-west-2.compute.amazonaws.com/pa4/searchPlayer.php",
+                    data: { playerQuery: $("#searchBox").val() },
+                    dataType: "jsonp",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        var finalresult = JSON.stringify(result);
+                        if (finalresult != "") {
+                            var finalhtml = "";
+                            finalhtml += "<div id=playerResult><h2>" + result.name + "</h2>";
+                            finalhtml += "<div id=pictureColumn class=column><img src=http://ec2-52-34-103-127.us-west-2.compute.amazonaws.com/pa1/profilePicture.jpg alt=Player Picture width=200px height=200px id=profilePicture></div>";
+                            finalhtml += "<div id=playerStatsColumn class=column><h3 class=statType>Player Stats</h3><p>";
+                            finalhtml += "Team: " +  result.team + "<br>";
+                            finalhtml += "Games played: " + result.GP + "<br>";
+							finalhtml += "Average PPG: " + result.PPG + "<br>";
+							finalhtml += "Average turnovers: " + result.MiscTO + "<br>";
+							finalhtml += "Average steals: " + result.MiscStl + "<br></p></div>";
+                            finalhtml += "<div id=miscStatsColumn class=column><h3 class=statType>Miscellaneous Stats</h3><p>";
+							finalhtml += "Average assists: " + result.MiscAst + "<br>";
+							finalhtml += "Average blocks: " + result.MiscBlk + "<br>";
+							finalhtml += "Average offensive rebounds: " + result.ReboundsOff + "<br>";
+							finalhtml += "Average defensive rebounds: " + result.ReboundsDef + "<br>";
+							finalhtml += "Average personal Fouls: " + result.MiscPF + "<br></p></div>";
+							finalhtml += "<div id=gameStatsColumn class=column><h3 class=statType>Game Stats</h3><table><tr><td></td><th>Made</th><th>Attempted</th><th>Percentage</th></tr><tr><td>Field Goals</td>";
+							finalhtml += "<td>" + result.FGMade + "</td>";
+							finalhtml += "<td>" + result.FGAtt + "</td>";
+							finalhtml += "<td>" + result.FGPct + "</td></tr><tr><td>3 Point Shots</td>";
+							finalhtml += "<td>" + result.ThreePtMade + "</td>";
+							finalhtml += "<td>" + result.ThreePtAtt + "</td>";
+							finalhtml += "<td>" + result.ThreePtPct + "</td></tr><tr><td>Free Throws</td>";
+							finalhtml += "<td>" + result.FTMade + "</td>";
+							finalhtml += "<td>" + result.FTAtt + "</td>";
+							finalhtml += "<td>" + result.FTPct + "</td></tr></table></div></div>";
+							$("#playerResults").html(finalhtml);
+                        }
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            $("#searchBox").keyup(function () {
+                $("#searchResults").html("");
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getSearchResult",
+                    dataType: "json",
+                    data: JSON.stringify({ searchQuery: $("#searchBox").val() }),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        var resultList = JSON.parse(result.d);
+                        var listHTML = "<h1>Search Results:</h1>";
+                        listHTML += "<ol>";
+                        for (var i = 0; i < resultList.length; i++) {
+                            var html = "";
+                            if (resultList[i] == "No Results Found") {
+                                listHTML += "No Results Found";
+                            } else {
+                                html += "<li class=\"result\">";
+                                html += "<a href=\"";
+                                html += resultList[i];
+                                html += "\">";
+                                html += resultList[i];
+                                html += "</a>";
+                                html += "</li>";
+                                listHTML = listHTML + html;
+                            }
+                        }
+                        listHTML += "</ol>";
+                        $("#searchResults").html(listHTML);
+                    }
+                });
+            });
+        });
+
+            
+    </script>
+</body>
+</html>

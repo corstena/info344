@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Albert's 344 Web Crawler Dashboard</title>
+	<meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"
+            integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="buttons">
+        <input type="submit" value="Start New Crawl" id="startbutton" />
+        <input type="submit" value="Stop Crawl" id="stopbutton" />
+        <input type="submit" value="Resume Crawl" id="resumebutton" />
+        <input type="submit" value="Delete Queues/Tables" id="deletebutton" />
+    </div>
+
+    <div id="statistics">
+        <h2>Statistics:</h2>
+        <input type="submit" value="Get Message Count" id="msgCount" />
+        <div id="countDisplay">
+
+        </div>
+
+        <input type="submit" value="Get System Statistics" id="systemStats" />
+        <div id="systemDisplay">
+
+        </div>
+
+        <input type="submit" value="Get Number of table Rows" id="tableCount" />
+        <div id="tableCountDisplay">
+
+        </div>
+
+        <input type="submit" value="Get Worker Role State" id="workerRoleState" />
+        <div id="workerRoleStateDisplay">
+
+        </div>
+
+        <input type="submit" value="Get Last Wikipedia Title Added" id="lastTitle" />
+        <div id="lastTitleDisplay">
+
+        </div>
+
+        <input type="submit" value="Get Number of Wikipedia Titles in Trie" id="titleCount" />
+        <div id="titleCountDisplay">
+
+        </div>
+    </div>
+
+    <div id="last10">
+        <h2>Last 10 URLs Crawled:</h2>
+        <input type="submit" value="Refresh" id="refresh10" />
+        <div id="last10display"></div>
+    </div>
+
+    <div id="brokenurls">
+        <h2>Last 100 Broken URLs:</h2>
+        <input type="submit" value="Refresh" id="brokenbutton" />
+        <div id="brokenDisplay"></div>
+    </div>
+
+    <script>
+        //Start the crawler on a new crawl
+        $(document).ready(function () {
+            $("#startbutton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/startCrawl",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                });
+            });
+        });
+
+        //Stop the crawler
+        $(document).ready(function () {
+            $("#stopbutton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/stopCrawl",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                });
+            });
+        });
+
+        //Resume the crawler after being stopped
+        $(document).ready(function () {
+            $("#resumebutton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/resumeCrawl",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                });
+            });
+        });
+
+        //Delete all queues and tables and stop the crawler
+        $(document).ready(function () {
+            $("#deletebutton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/clearCrawl",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: alert("Deleting queues and tables...Please wait at least one minute for all queues and tables to fully delete before restarting the crawl. To start a new crawl, click Start New Crawl")
+                });
+            });
+        });
+
+        //Get number of message in htmlqueue
+        $(document).ready(function () {
+            $("#msgCount").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getMessageCount",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var finalresult = JSON.parse(result.d);
+                        var html = ""
+                        html += "<p>Message Count: ";
+                        html += finalresult;
+                        html += "</p>";
+                        $("#countDisplay").html(html);
+
+                    }
+                });
+            });
+        });
+
+        //Get the system stats (CPU usage and available RAM)
+        $(document).ready(function () {
+            $("#systemStats").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getSystemStats",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var resultList = JSON.parse(result.d);
+                        var html = "";
+                        html += "<p>CPU Usage: ";
+                        html += resultList[0];
+                        html += "</p>";
+                        html += "<p>Available Memory: ";
+                        html += resultList[1];
+                        html += "</p>";
+                        $("#systemDisplay").html("");
+                        $("#systemDisplay").html(html);
+                    }
+                });
+            });
+        });
+
+        //Gets the number of rows in the table
+        $(document).ready(function () {
+            $("#tableCount").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getTableCount",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var finalresult = JSON.parse(result.d);
+                        var html = ""
+                        html += "<p>Number of rows in URL Table: ";
+                        html += finalresult;
+                        html += "</p>";
+                        $("#tableCountDisplay").html(html);
+                    }
+                });
+            });
+        });
+
+        //Gets the state of the worker
+        $(document).ready(function () {
+            $("#workerRoleState").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getWorkerState",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var finalresult = JSON.parse(result.d);
+                        var html = ""
+                        html += "<p>Worker Status: ";
+                        html += finalresult;
+                        html += "</p>";
+                        $("#workerRoleStateDisplay").html(html);
+                    }
+                });
+            });
+        });
+
+        //Get the last 10 entires to the urltable
+        $(document).ready(function () {
+            $("#refresh10").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getLast10",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var resultList = JSON.parse(result.d);
+                        var listHTML = "";
+                        for (var i = 0; i < resultList.length; i++) {
+                            var html = "";
+                            html += "<ul><li class=\"result\">";
+                            html += "<h5>";
+                            html += resultList[i];
+                            html += "</h5>";
+                            html += "</li>";
+                            html += "</ul>";
+                            listHTML = listHTML + html;
+                        }
+                        $("#last10display").html("");
+                        $("#last10display").html(listHTML);
+                    }
+                });
+            });
+        });
+
+        //Gets the last title that was added to the trie
+        $(document).ready(function () {
+            $("#lastTitle").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getLastTitle",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var finalresult = JSON.parse(result.d);
+                        var html = ""
+                        html += "<p>Last title added to the Wikipedia Title Trie: ";
+                        html += finalresult;
+                        html += "</p>";
+                        $("#lastTitleDisplay").html(html);
+                    }
+                });
+            });
+        });
+
+        //Gets the number of titles in the trie
+        $(document).ready(function () {
+            $("#titleCount").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getTitleCount",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var finalresult = JSON.parse(result.d);
+                        var html = ""
+                        html += "<p>Number Wikipedia titles in the Trie: ";
+                        html += finalresult;
+                        html += "</p>";
+                        $("#titleCountDisplay").html(html);
+                    }
+                });
+            });
+        });
+
+        //Get a list of all broken URLs
+        $(document).ready(function () {
+            $("#brokenbutton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/webcrawler.asmx/getBrokenUrls",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        var resultList = JSON.parse(result.d);
+                        var listHTML = "";
+                        for (var i = 0; i < resultList.length; i++) {
+                            var html = "";
+                            html += "<ul><li class=\"result\">";
+                            html += "<h5>";
+                            html += resultList[i];
+                            html += "</h5>";
+                            html += "</li>";
+                            html += "</ul>";
+                            listHTML = listHTML + html;
+                        }
+                        $("#brokenDisplay").html("");
+                        $("#brokenDisplay").html(listHTML);
+                    }
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>
